@@ -1,9 +1,8 @@
 <script setup>
-defineProps({
-  type: {
-    type: String,
-    default: "input",
-  },
+import { inject } from 'vue';
+
+const {name} = defineProps({
+
   name: {
     type: String,
   },
@@ -11,15 +10,13 @@ defineProps({
   as: {
     type: String,
   },
-  onChange: {
-    type: Function,
-  },
-  updateValue: {
-    type: Function,
-  },
 });
+
+const update = inject('update');
+
+
 </script>
 
 <template>
-  <input :name="name" type="text" v-on:change="onChange" />
+  <input :name="name" type="text" @keydown="update(name, $event.target.value)" />
 </template>

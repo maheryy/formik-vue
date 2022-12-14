@@ -1,7 +1,7 @@
 <script setup>
-import { reactive } from "vue";
+import { provide, reactive } from "vue";
 
-defineProps({
+const {initialValues, onSubmit, validate} = defineProps({
   initialValues: {
     type: Object,
   },
@@ -13,15 +13,19 @@ defineProps({
   },
 });
 
-const data = reactive({});
+const data = reactive({
+  values: initialValues,
+});
 
-const handleChange = (name, value) => {
-  console.logo(name, value);
-};
+const updateValue = (key, value) => {
+  data.values[key] = value;
+}
+
+provide("update", updateValue);
 </script>
 
 <template>
-  <form @submit.prevent="onSubmit">
-    <slot :handle-change="handleChange"></slot>
+  <form @submit.prevent="onSubmit(data)">
+    <slot></slot>
   </form>
 </template>
