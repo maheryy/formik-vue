@@ -1,7 +1,7 @@
 <script setup>
-import { provide, reactive } from "vue";
+import { provide, reactive, ref, readonly } from "vue";
 
-const {initialValues, onSubmit, validate} = defineProps({
+const { initialValues, onSubmit, validate } = defineProps({
   initialValues: {
     type: Object,
   },
@@ -13,19 +13,34 @@ const {initialValues, onSubmit, validate} = defineProps({
   },
 });
 
-const data = reactive({
-  values: initialValues,
-});
+const values = reactive(initialValues);
+const errors = ref({});
+const isSubmitting = ref(false);
 
 const updateValue = (key, value) => {
-  data.values[key] = value;
-}
+  values[key] = value;
+};
+
+const handleSubmit = async () => {
+  isSubmitting.value = true;
+  errors.value = await validate(values);
+
+  if (Object.keys(errors.value).length) {
+    isSubmitting.value = false;
+    return;
+  }
+
+  await onSubmit(values);
+  isSubmitting.value = false;
+};
 
 provide("update", updateValue);
+provide("initialValues", readonly(initialValues));
+provide("errors", readonly(errors));
 </script>
 
 <template>
-  <form @submit.prevent="onSubmit(data)">
+  <form @submit.prevent="handleSubmit">
     <slot></slot>
   </form>
 </template>
